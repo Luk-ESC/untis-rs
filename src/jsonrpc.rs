@@ -61,14 +61,14 @@ pub struct Error {
 }
 
 pub(crate) struct Client {
-    http_client: reqwest::blocking::Client,
+    http_client: reqwest::Client,
     url: String,
     last_req_id: usize,
 }
 
 impl Client {
     pub fn new(url: &str) -> Self {
-        let client = reqwest::blocking::Client::builder()
+        let client = reqwest::Client::builder()
             .cookie_store(true)
             .build()
             .unwrap();
@@ -84,21 +84,26 @@ impl Client {
         self.last_req_id.to_string()
     }
 
-    pub fn request<T: DeserializeOwned, P: Serialize>(
+    pub async fn request<T: DeserializeOwned, P: Serialize>(
         &mut self,
         method: &'static str,
         params: P,
     ) -> Result<T, error::Error> {
         let req_id = &self.get_id();
         let request = Request::new(req_id, method, params);
-        let response = self.http_client.post(&self.url).json(&request).send()?;
+        let response = self
+            .http_client
+            .post(&self.url)
+            .json(&request)
+            .send()
+            .await?;
 
         let status = response.status();
         if !status.is_success() {
             return Err(error::Error::Http(status));
         }
 
-        let text = response.text()?;
+        let text = response.text().await?;
         let response: Response<T> = serde_json::from_str(&text)?;
 
         match response {

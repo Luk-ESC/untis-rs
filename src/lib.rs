@@ -7,8 +7,9 @@
 //!
 //! ## Examples
 //! ```rust
-//! fn main() -> Result<(), untis::Error> {
-//!   let results = untis::schools::search("School Name")?;
+//! #[tokio::main]
+//! async fn main() -> Result<(), untis::Error> {
+//!   let results = untis::schools::search("School Name").await?;
 //!   let school = match results.first() {
 //!     None => {
 //!       println!("No school found");
@@ -17,9 +18,9 @@
 //!     Some(v) => v
 //!   };
 //!
-//!   let mut client = school.client_login("username", "password")?;
+//!   let mut client = school.client_login("username", "password").await?;
 //!
-//!   let timetable = client.own_timetable_current_week()?;
+//!   let timetable = client.own_timetable_current_week().await?;
 //!
 //!   // profit
 //!

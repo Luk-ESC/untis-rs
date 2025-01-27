@@ -7,30 +7,36 @@ fn get_client() -> jsonrpc::Client {
 }
 
 /// Returns all schools matching the query or an empty vec if there are too many results.
-pub fn search(query: &str) -> Result<Vec<School>, Error> {
-    let result = get_client().request(
-        "searchSchool",
-        vec![FindSchoolParams::Search { search: query }],
-    );
+pub async fn search(query: &str) -> Result<Vec<School>, Error> {
+    let result = get_client()
+        .request(
+            "searchSchool",
+            vec![FindSchoolParams::Search { search: query }],
+        )
+        .await;
     catch_too_many(result)
 }
 
 /// Retrieves a school by its id.
-pub fn get_by_id(id: &usize) -> Result<School, Error> {
-    let result = get_client().request(
-        "searchSchool",
-        vec![FindSchoolParams::ById { schoolid: id }],
-    );
+pub async fn get_by_id(id: &usize) -> Result<School, Error> {
+    let result = get_client()
+        .request(
+            "searchSchool",
+            vec![FindSchoolParams::ById { schoolid: id }],
+        )
+        .await;
 
     get_first(catch_too_many(result)?)
 }
 
 /// Retrieves a school by it's [`login_name`](School#structfield.login_name).
-pub fn get_by_name(name: &str) -> Result<School, Error> {
-    let result = get_client().request(
-        "searchSchool",
-        vec![FindSchoolParams::ByName { schoolname: name }],
-    );
+pub async fn get_by_name(name: &str) -> Result<School, Error> {
+    let result = get_client()
+        .request(
+            "searchSchool",
+            vec![FindSchoolParams::ByName { schoolname: name }],
+        )
+        .await;
 
     get_first(catch_too_many(result)?)
 }

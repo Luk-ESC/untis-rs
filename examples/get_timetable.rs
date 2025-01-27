@@ -3,12 +3,13 @@
 /// and then retrieving a user's own timetable.
 ///
 
-fn main() -> Result<(), untis::Error> {
+#[tokio::main]
+async fn main() -> Result<(), untis::Error> {
     // Get the school by its id.
-    let school = untis::schools::get_by_id(&42)?;
+    let school = untis::schools::get_by_id(&42).await?;
 
     // Log in with your credentials. The school's details are filled in automatically.
-    let result = school.client_login("username", "password");
+    let result = school.client_login("username", "password").await;
     let mut client: untis::Client;
 
     // Match the result to handle specific error cases.
@@ -26,7 +27,7 @@ fn main() -> Result<(), untis::Error> {
     let date = chrono::Local::now().date_naive() + chrono::Duration::weeks(2);
 
     // Get the client's own timetable until 2 weeks from now.
-    let timetable = client.own_timetable_until(&date.into())?;
+    let timetable = client.own_timetable_until(&date.into()).await?;
 
     for lesson in timetable {
         println!("{:?}", lesson);
